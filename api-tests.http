@@ -1,0 +1,144 @@
+### API Tests - Oscar Pool
+### Instale a extensão "REST Client" no VS Code para executar esses testes
+### Ou use curl/Postman com os exemplos abaixo
+
+@baseUrl = http://localhost:3000/api
+@email = gerenciacostta@gmail.com
+@password = senha123
+@userId = 
+@bolaoId = 
+@categoryId = 
+@nomineeId =
+
+### ============================================
+### 1. CRIAR USUÁRIO (SIGNUP)
+### ============================================
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "name": "João Costa",
+  "phone": "(61) 99839-0402",
+  "city": "São Paulo",
+  "state": "SP"
+}
+
+### ============================================
+### 2. LOGIN
+### ============================================
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### ============================================
+### 3. LISTAR CATEGORIAS COM NOMINEES
+### ============================================
+GET {{baseUrl}}/categories
+
+### ============================================
+### 4. LISTAR TODOS OS NOMINEES
+### ============================================
+GET {{baseUrl}}/nominees
+
+### ============================================
+### 5. LISTAR NOMINEES DE UMA CATEGORIA
+### ============================================
+GET {{baseUrl}}/nominees?categoryId={{categoryId}}
+
+### ============================================
+### 5. LISTAR NOMINEES DE UMA CATEGORIA
+### ============================================
+GET {{baseUrl}}/nominees?categoryId={{categoryId}}
+
+### ============================================
+### 6. CRIAR BOLÃO INDIVIDUAL
+### ============================================
+POST {{baseUrl}}/boloes
+Content-Type: application/json
+
+{
+  "name": "Meu Bolão Individual",
+  "type": "individual",
+  "creator_id": "{{userId}}"
+}
+
+### ============================================
+### 7. CRIAR BOLÃO EM GRUPO
+### ============================================
+POST {{baseUrl}}/boloes
+Content-Type: application/json
+
+{
+  "name": "Bolão da Galera",
+  "type": "group",
+  "creator_id": "{{userId}}"
+}
+
+### ============================================
+### 8. LISTAR BOLÕES DO USUÁRIO
+### ============================================
+GET {{baseUrl}}/boloes?userId={{userId}}
+
+### ============================================
+### 9. BUSCAR BOLÃO POR ID
+### ============================================
+GET {{baseUrl}}/boloes/{{bolaoId}}
+
+### ============================================
+### 10. LISTAR PARTICIPANTES DO BOLÃO
+### ============================================
+GET {{baseUrl}}/boloes/{{bolaoId}}/participants
+
+### ============================================
+### 11. ENTRAR EM BOLÃO POR ID
+### ============================================
+POST {{baseUrl}}/boloes/{{bolaoId}}/join
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}"
+}
+
+### ============================================
+### 12. CRIAR/ATUALIZAR PALPITE
+### ============================================
+POST {{baseUrl}}/palpites
+Content-Type: application/json
+
+{
+  "bolao_id": "{{bolaoId}}",
+  "user_id": "{{userId}}",
+  "category_id": "{{categoryId}}",
+  "nominee_id": "{{nomineeId}}"
+}
+
+### ============================================
+### 13. LISTAR PALPITES DO USUÁRIO EM UM BOLÃO
+### ============================================
+GET {{baseUrl}}/palpites?bolaoId={{bolaoId}}&userId={{userId}}
+
+### ============================================
+### 14. VER RANKING DE UM BOLÃO
+### ============================================
+GET {{baseUrl}}/ranking/{{bolaoId}}
+
+### ============================================
+### 15. VER RANKING GLOBAL
+### ============================================
+GET {{baseUrl}}/ranking/global
+
+### ============================================
+### 16. LOGOUT
+### ============================================
+POST {{baseUrl}}/auth/logout
+
+### ============================================
+### 17. DELETAR BOLÃO
+### ============================================
+DELETE {{baseUrl}}/boloes/{{bolaoId}}
