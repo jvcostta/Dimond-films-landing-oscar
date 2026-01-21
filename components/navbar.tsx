@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/auth-context'
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const router = useRouter()
+  const { user } = useAuth()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,8 +26,13 @@ export function Navbar() {
   }
 
   const handleMeuPalpiteClick = async () => {
-    // Redireciona para a página Meus Palpites
-    router.push('/meus-palpites')
+    if (user) {
+      // Se está logado, redireciona para a página Meus Palpites
+      router.push('/meus-palpites')
+    } else {
+      // Se não está logado, faz scroll para o formulário
+      scrollToSection('meu-palpite')
+    }
   }
 
   return (
@@ -50,19 +57,19 @@ export function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             <button
               onClick={() => scrollToSection('como-funciona')}
-              className="text-white/90 hover:text-[#ffcc33] transition-colors text-sm font-medium"
+              className="text-white/90 hover:text-[#ffcc33] transition-colors text-sm font-medium cursor-pointer"
             >
               Como Funciona
             </button>
             <button
               onClick={() => scrollToSection('premio-oficial')}
-              className="text-white/90 hover:text-[#ffcc33] transition-colors text-sm font-medium"
+              className="text-white/90 hover:text-[#ffcc33] transition-colors text-sm font-medium cursor-pointer"
             >
               Prêmio Oficial
             </button>
             <button
               onClick={handleMeuPalpiteClick}
-              className="px-4 py-2 rounded-full bg-black border border-[#ffcc33] text-white hover:bg-[#ffcc33] hover:text-black transition-all duration-300 text-sm font-bold shadow-[0_0_6px_rgba(255,204,51,0.6)] hover:shadow-[0_0_12px_rgba(255,204,51,0.8)]"
+              className="px-4 py-2 rounded-full bg-black border border-[#ffcc33] text-white hover:bg-[#ffcc33] hover:text-black transition-all duration-300 text-sm font-bold shadow-[0_0_6px_rgba(255,204,51,0.6)] hover:shadow-[0_0_12px_rgba(255,204,51,0.8)] cursor-pointer"
             >
               Meu Palpite
             </button>
@@ -72,7 +79,7 @@ export function Navbar() {
           <div className="md:hidden">
             <button
               onClick={handleMeuPalpiteClick}
-              className="px-3 py-1.5 rounded-full bg-black border border-[#ffcc33] text-white text-xs font-bold"
+              className="px-3 py-1.5 rounded-full bg-black border border-[#ffcc33] text-white text-xs font-bold cursor-pointer"
             >
               Meu Palpite
             </button>

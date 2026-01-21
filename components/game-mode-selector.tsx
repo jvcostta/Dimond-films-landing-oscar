@@ -174,7 +174,7 @@ export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
             {/* Individual Mode */}
             <button
               onClick={() => setSelectedMode("individual")}
-              className={`group relative p-8 border rounded-sm transition-all duration-300 text-left ${
+              className={`group relative p-8 border rounded-sm transition-all duration-300 text-left cursor-pointer ${
                 selectedMode === "individual"
                   ? "border-amber-400 bg-amber-400/10"
                   : "border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10"
@@ -209,7 +209,7 @@ export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
             {/* Group Mode */}
             <button
               onClick={() => setSelectedMode("group")}
-              className={`group relative p-8 border rounded-sm transition-all duration-300 text-left ${
+              className={`group relative p-8 border rounded-sm transition-all duration-300 text-left cursor-pointer ${
                 selectedMode === "group"
                   ? "border-amber-400 bg-amber-400/10"
                   : "border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10"
@@ -253,7 +253,7 @@ export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
                     setInviteCode("")
                     setShowRankingAlert(true)
                   }}
-                  className={`p-6 border rounded-sm transition-all duration-300 text-left ${
+                  className={`p-6 border rounded-sm transition-all duration-300 text-left cursor-pointer ${
                     groupAction === "create"
                       ? "border-amber-400 bg-amber-400/10"
                       : "border-white/20 bg-white/5 hover:border-white/40"
@@ -269,7 +269,7 @@ export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
                     setGroupName("")
                     setShowRankingAlert(true)
                   }}
-                  className={`p-6 border rounded-sm transition-all duration-300 text-left ${
+                  className={`p-6 border rounded-sm transition-all duration-300 text-left cursor-pointer ${
                     groupAction === "join"
                       ? "border-amber-400 bg-amber-400/10"
                       : "border-white/20 bg-white/5 hover:border-white/40"

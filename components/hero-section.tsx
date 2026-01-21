@@ -65,7 +65,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
               {/* Tagline */}
               <div className="max-w-3xl mx-auto">
                 <p className="text-lg md:text-xl lg:text-1.5xl font-light text-white/95 drop-shadow-lg leading-relaxed tracking-wide">
-                  Mostre que você manda no mundo do cinema. Dispute o bolão principal com pessoas de todo o Brasil e concorra a 1 ano de cinema grátis* <br className="hidden md:block" /> + um Apple Watch SE.
+                  Mostre que você domina o mundo do cinema. Dispute o bolão principal com pessoas de todo o Brasil e concorra a 1 ano de cinema grátis* <br className="hidden md:block" /> + um Apple Watch SE.
                 </p>
               </div>
 
@@ -78,7 +78,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
 
               {/* CTA Button */}
               <div className="flex justify-center pt-4">
-                <GoldButton onClick={onStart} size="lg">
+                <GoldButton onClick={onStart} size="default" className="md:text-lg md:px-8 md:py-6">
                   PARTICIPAR DO BOLÃO OFICIAL
                 </GoldButton>
               </div>

@@ -61,7 +61,7 @@ type RankingEntry = {
 }
 
 type ModalState = {
-  type: 'palpite' | 'ranking-grupo' | 'ranking-geral' | null
+  type: 'palpite' | 'ranking-grupo' | 'ranking-geral' | 'codigo-grupo' | null
   bolaoId?: string
   bolaoName?: string
   bolaoInviteCode?: string
@@ -373,7 +373,7 @@ export default function MeusPalpitesPage() {
       }`}>
         <button
           onClick={() => setIsSidebarOpen(false)}
-          className="absolute top-4 left-4 text-white/80 hover:text-white"
+          className="absolute top-4 left-4 text-white/80 hover:text-white cursor-pointer"
         >
           <X className="w-6 h-6" />
         </button>
@@ -391,7 +391,7 @@ export default function MeusPalpitesPage() {
         <div className="flex-1"></div>
         <Button
           onClick={handleLogout}
-          className="w-full bg-[#ffcc33] text-black hover:bg-[#ffcc33]/90 font-semibold"
+          className="w-full bg-[#ffcc33] text-black hover:bg-[#ffcc33]/90 font-semibold cursor-pointer"
         >
           Sair
         </Button>
@@ -413,7 +413,7 @@ export default function MeusPalpitesPage() {
               onClick={() => router.push('/')}
               variant="ghost"
               size="sm"
-              className="text-white hover:bg-white/10 gap-2"
+              className="text-white hover:bg-white/10 gap-2 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
               Voltar
@@ -429,7 +429,7 @@ export default function MeusPalpitesPage() {
               onClick={() => setIsSidebarOpen(true)}
               variant="ghost"
               size="sm"
-              className="text-white hover:bg-white/10"
+              className="text-white hover:bg-white/10 cursor-pointer"
             >
               <Menu className="w-6 h-6" />
             </Button>
@@ -458,7 +458,7 @@ export default function MeusPalpitesPage() {
               </p>
               <Button
                 onClick={handleIniciarBolao}
-                className="bg-black border border-[#ffcc33] text-white hover:bg-[#ffcc33] hover:text-black"
+                className="bg-black border border-[#ffcc33] text-white hover:bg-[#ffcc33] hover:text-black cursor-pointer"
               >
                 Iniciar Meu Bolão
               </Button>
@@ -518,7 +518,7 @@ export default function MeusPalpitesPage() {
                         <Button
                           onClick={() => router.push('/#meu-palpite')}
                           size="sm"
-                          className="bg-[#ffcc33] text-black hover:bg-[#ffcc33]/90 text-xs md:text-sm"
+                          className="bg-[#ffcc33] text-black hover:bg-[#ffcc33]/90 text-xs md:text-sm cursor-pointer"
                         >
                           Fazer Palpites
                         </Button>
@@ -530,7 +530,7 @@ export default function MeusPalpitesPage() {
                           <Button
                             onClick={() => handleOpenPalpiteModal(bolao)}
                             size="sm"
-                            className="w-full md:w-auto bg-white/5 text-white border border-white/20 hover:bg-white/10 gap-2 text-xs md:text-sm justify-center"
+                            className="w-full md:w-auto bg-white/5 text-white border border-white/20 hover:bg-white/10 gap-2 text-xs md:text-sm justify-center cursor-pointer"
                           >
                             <Eye className="w-3 h-3 md:w-4 md:h-4" />
                             Ver Palpite
@@ -540,7 +540,7 @@ export default function MeusPalpitesPage() {
                               <Button
                                 onClick={() => handleOpenRankingGrupoModal(bolao)}
                                 size="sm"
-                                className="w-full md:w-auto bg-white/5 text-white border border-blue-400 hover:bg-white/10 gap-2 text-xs md:text-sm justify-center"
+                                className="w-full md:w-auto bg-white/5 text-white border border-blue-400 hover:bg-white/10 gap-2 text-xs md:text-sm justify-center cursor-pointer"
                               >
                                 <Users className="w-3 h-3 md:w-4 md:h-4 text-blue-400" />
                                 Ver Ranking do Grupo
@@ -548,7 +548,7 @@ export default function MeusPalpitesPage() {
                               <Button
                                 onClick={() => handleOpenCodigoGrupoModal(bolao)}
                                 size="sm"
-                                className="w-full md:w-auto bg-white/5 text-white border border-green-400 hover:bg-white/10 gap-2 text-xs md:text-sm justify-center"
+                                className="w-full md:w-auto bg-white/5 text-white border border-green-400 hover:bg-white/10 gap-2 text-xs md:text-sm justify-center cursor-pointer"
                               >
                                 <Copy className="w-3 h-3 md:w-4 md:h-4 text-green-400" />
                                 Ver Código do Grupo
@@ -558,7 +558,7 @@ export default function MeusPalpitesPage() {
                           <Button
                             onClick={() => handleOpenRankingGeralModal(bolao)}
                             size="sm"
-                            className="w-full md:w-auto bg-white/5 text-white border border-[#ffcc33] hover:bg-white/10 gap-2 text-xs md:text-sm justify-center"
+                            className="w-full md:w-auto bg-white/5 text-white border border-[#ffcc33] hover:bg-white/10 gap-2 text-xs md:text-sm justify-center cursor-pointer"
                           >
                             <Trophy className="w-3 h-3 md:w-4 md:h-4 text-[#ffcc33]" />
                             Ver Ranking Geral
@@ -581,7 +581,7 @@ export default function MeusPalpitesPage() {
             {/* Close button */}
             <button
               onClick={() => setShowEmailAlert(false)}
-              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors cursor-pointer"
             >
               <X className="w-6 h-6" />
             </button>
@@ -622,7 +622,7 @@ export default function MeusPalpitesPage() {
             {/* Close button */}
             <Button
               onClick={() => setShowEmailAlert(false)}
-              className="w-full mt-6 bg-amber-400 text-black hover:bg-amber-500 font-semibold py-3 rounded-sm"
+              className="w-full mt-6 bg-amber-400 text-black hover:bg-amber-500 font-semibold py-3 rounded-sm cursor-pointer"
             >
               Entendi
             </Button>
@@ -839,7 +839,7 @@ export default function MeusPalpitesPage() {
                     copiedCode 
                       ? 'bg-green-500 hover:bg-green-500' 
                       : 'bg-green-400 hover:bg-green-500'
-                  } text-black transition-all duration-200`}
+                  } text-black transition-all duration-200 cursor-pointer`}
                 >
                   {copiedCode ? (
                     <>
@@ -866,7 +866,7 @@ export default function MeusPalpitesPage() {
 
             <Button
               onClick={closeModal}
-              className="w-full bg-white/10 text-white hover:bg-white/20 border border-white/20"
+              className="w-full bg-white/10 text-white hover:bg-white/20 border border-white/20 cursor-pointer"
             >
               Fechar
             </Button>
@@ -876,3 +876,4 @@ export default function MeusPalpitesPage() {
     </div>
   )
 }
+

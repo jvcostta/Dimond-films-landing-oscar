@@ -12,8 +12,8 @@ interface ConfirmationScreenProps {
 export function ConfirmationScreen({ gameMode, inviteCode, onBack }: ConfirmationScreenProps) {
   const shareOnWhatsApp = () => {
     const message = inviteCode 
-      ? `Acabei de participar do Bolão do Oscar® 2026 - Diamond Films! 🎬 Código do bolão: ${inviteCode}\nhttps://dimond-films-landing-oscar-3s2d.vercel.app/`
-      : `Acabei de participar do Bolão do Oscar® 2026 - Diamond Films! 🎬 Código do bolão: \nhttps://dimond-films-landing-oscar-3s2d.vercel.app/`
+      ? `Acabei de participar do Bolão do Oscar® 2026 - Diamond Films! Código do bolão: ${inviteCode}\nhttps://dimond-films-landing-oscar-3s2d.vercel.app/`
+      : `Acabei de participar do Bolão do Oscar® 2026 - Diamond Films! Código do bolão: \nhttps://dimond-films-landing-oscar-3s2d.vercel.app/`
     
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank")
   }

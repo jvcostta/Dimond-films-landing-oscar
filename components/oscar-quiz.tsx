@@ -269,7 +269,7 @@ export function OscarQuiz({ bolaoId, onComplete, onBack }: OscarQuizProps) {
                 <button
                   key={nominee.id}
                   onClick={() => handleSelect(nominee.id)}
-                  className={`w-full p-5 border rounded-sm transition-all duration-200 text-left relative ${
+                  className={`w-full p-5 border rounded-sm transition-all duration-200 text-left relative cursor-pointer ${
                     selections[currentCategory.id] === nominee.id
                       ? "border-amber-400 bg-amber-400/10"
                       : "border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10"

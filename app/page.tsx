@@ -36,6 +36,10 @@ function HomeContent() {
   const scrollToForm = () => {
     const el = document.getElementById('meu-palpite')
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // Se estiver deslogado, muda para modo signup
+    if (!user) {
+      setMode('signup')
+    }
   }
 
   return (
