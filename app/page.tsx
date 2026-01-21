@@ -29,10 +29,12 @@ export default function Home() {
   const [inviteCode, setInviteCode] = useState<string>("")
   const [showLogin, setShowLogin] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
+  const [confirmationStatus, setConfirmationStatus] = useState<'none' | 'pending' | 'success'>('none')
   const formSectionRef = useRef<HTMLDivElement>(null)
 
   const handleEmailConfirmed = () => {
     setShowConfirmation(true)
+    setConfirmationStatus('success')
     setShowLogin(true)
     
     // Scroll para o formulário após 100ms
@@ -58,7 +60,20 @@ export default function Home() {
 
   const handleRegistration = (data: any) => {
     setUserData(data)
-    setStep("game-mode")
+    // Após cadastro, direciona para login e avisa sobre confirmação de email
+    setShowLogin(true)
+    setShowConfirmation(true)
+    setConfirmationStatus('pending')
+    // Mantém na etapa de registro para exibir o LoginForm
+    setStep("registration")
+    // Scroll até o formulário
+    setTimeout(() => {
+      formSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+    }, 100)
+    // Oculta mensagem após alguns segundos
+    setTimeout(() => {
+      setShowConfirmation(false)
+    }, 5000)
   }
 
   const handleGameMode = (mode: GameMode, id: string, code?: string) => {
@@ -119,9 +134,11 @@ export default function Home() {
               <div className="py-16 px-4">
                 {/* Mensagem de confirmação de email */}
                 {showConfirmation && (
-                  <div className="max-w-md mx-auto mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-center">
-                    <p className="text-green-400 font-medium">
-                      ✓ Email confirmado com sucesso! Faça login para continuar.
+                  <div className={`max-w-md mx-auto mb-6 p-4 rounded-lg text-center border ${confirmationStatus === 'success' ? 'bg-green-500/20 border-green-500/50' : 'bg-amber-500/20 border-amber-500/50'}`}>
+                    <p className={confirmationStatus === 'success' ? 'text-green-400 font-medium' : 'text-amber-300 font-medium'}>
+                      {confirmationStatus === 'success'
+                        ? '✓ Email confirmado com sucesso! Faça login para continuar.'
+                        : 'Enviamos um link de confirmação para seu email. Confirme seu email e faça login para continuar.'}
                     </p>
                   </div>
                 )}

@@ -11,20 +11,7 @@ export function EmailConfirmationHandler({ onConfirmed }: EmailConfirmationHandl
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const confirmed = searchParams.get('confirmed')
-    const hasRefreshed = sessionStorage.getItem('email-confirmed-refreshed')
-    
-    if (confirmed === 'true' && !hasRefreshed) {
-      // Marca que vai fazer o refresh
-      sessionStorage.setItem('email-confirmed-refreshed', 'true')
-      // Remove o parâmetro e recarrega a página
-      window.location.href = '/'
-      return
-    }
-    
-    // Se já refreshou, mostra a confirmação e limpa a flag
-    if (hasRefreshed === 'true') {
-      sessionStorage.removeItem('email-confirmed-refreshed')
+    if (searchParams.get('confirmed') === 'true') {
       onConfirmed()
     }
   }, [searchParams, onConfirmed])
