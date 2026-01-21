@@ -5,27 +5,27 @@ import { cookies } from 'next/headers'
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
+  const tokenHash = requestUrl.searchParams.get('token_hash')
+  const type = requestUrl.searchParams.get('type')
+
+  const supabase = await createServerSupabaseClient()
 
   if (code) {
-    const supabase = await createServerSupabaseClient()
-    
-    // Troca o code por uma sessão apenas para confirmar o email
+    // Fluxo OAuth/magic link com code
     await supabase.auth.exchangeCodeForSession(code)
-    
-    // Faz logout completo
-    await supabase.auth.signOut()
-    
-    // Limpa todos os cookies de autenticação
-    const cookieStore = await cookies()
-    const allCookies = cookieStore.getAll()
-    
-    // Remove todos os cookies do Supabase
-    allCookies.forEach(cookie => {
-      if (cookie.name.includes('supabase') || cookie.name.includes('auth')) {
-        cookieStore.delete(cookie.name)
-      }
-    })
+  } else if (tokenHash && (type === 'signup' || type === 'email_change' || type === 'recovery')) {
+
   }
+
+  // Faz logout completo e limpa cookies independente do fluxo
+  await supabase.auth.signOut()
+  const cookieStore = await cookies()
+  const allCookies = cookieStore.getAll()
+  allCookies.forEach(cookie => {
+    if (cookie.name.includes('supabase') || cookie.name.includes('auth')) {
+      cookieStore.delete(cookie.name)
+    }
+  })
 
   // Redireciona para home com parâmetro de confirmação
   return NextResponse.redirect(new URL('/?confirmed=true', requestUrl.origin))

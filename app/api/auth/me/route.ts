@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { UsersService } from '@/lib/services/users.service'
 
@@ -6,7 +6,7 @@ import { UsersService } from '@/lib/services/users.service'
  * GET /api/auth/me
  * Retorna os dados atualizados do usuário autenticado
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createServerSupabaseClient()
     

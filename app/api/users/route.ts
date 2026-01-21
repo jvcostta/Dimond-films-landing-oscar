@@ -49,6 +49,9 @@ export async function POST(request: NextRequest) {
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: body.email,
       password: body.password,
+      options: {
+        emailRedirectTo: `${request.nextUrl.origin}/auth/callback`,
+      },
     })
 
     if (authError) {
