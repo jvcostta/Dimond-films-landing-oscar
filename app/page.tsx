@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useRef } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useRef, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { Navbar } from "@/components/navbar"
 import { HeroSection } from "@/components/hero-section"
@@ -21,13 +21,33 @@ type GameMode = "individual" | "group"
 export default function Home() {
   const { user } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [step, setStep] = useState<Step>("registration")
   const [gameMode, setGameMode] = useState<GameMode | null>(null)
   const [bolaoId, setBolaoId] = useState<string>("")
   const [userData, setUserData] = useState<any>(null)
   const [inviteCode, setInviteCode] = useState<string>("")
   const [showLogin, setShowLogin] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
   const formSectionRef = useRef<HTMLDivElement>(null)
+
+  // Detecta se veio do callback de confirmação de email
+  useEffect(() => {
+    if (searchParams.get('confirmed') === 'true') {
+      setShowConfirmation(true)
+      setShowLogin(true)
+      
+      // Scroll para o formulário após 100ms
+      setTimeout(() => {
+        scrollToForm()
+      }, 100)
+      
+      // Remove a mensagem após 5 segundos
+      setTimeout(() => {
+        setShowConfirmation(false)
+      }, 5000)
+    }
+  }, [searchParams])
 
   const scrollToForm = () => {
     // Sempre rola até o formulário
@@ -96,6 +116,15 @@ export default function Home() {
           <>
             {showLogin ? (
               <div className="py-16 px-4">
+                {/* Mensagem de confirmação de email */}
+                {showConfirmation && (
+                  <div className="max-w-md mx-auto mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-center">
+                    <p className="text-green-400 font-medium">
+                      ✓ Email confirmado com sucesso! Faça login para continuar.
+                    </p>
+                  </div>
+                )}
+                
                 <LoginForm onSuccess={() => {
                   setStep("game-mode")
                   setTimeout(() => {
