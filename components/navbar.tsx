@@ -3,11 +3,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/auth-context'
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
-  const { user } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
@@ -26,13 +24,8 @@ export function Navbar() {
   }
 
   const handleMeuPalpiteClick = async () => {
-    if (!user) {
-      // Se não está logado, vai para o setor de login/registro
-      scrollToSection('meu-palpite')
-    } else {
-      // Se está logado, vai direto para a página de acompanhamento
-      router.push('/meus-palpites')
-    }
+    // Redireciona para a página Meus Palpites
+    router.push('/meus-palpites')
   }
 
   return (

@@ -16,13 +16,16 @@ interface RouteParams {
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { searchParams } = new URL(request.url)
-    const userIdParam = searchParams.get('userId')
+    const userIdParam = searchParams.get('userId') || searchParams.get('user_id')
     
-    let currentUser = await UsersService.getCurrentUser()
-
-    // Fallback: tenta buscar pelo userId passado como parâmetro (desenvolvimento)
-    if (!currentUser && userIdParam) {
+    // Prioriza userId da query, depois tenta sessão do servidor
+    let currentUser = null
+    if (userIdParam) {
       currentUser = await UsersService.getUserById(userIdParam)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
     }
 
     if (!currentUser) {
@@ -84,7 +87,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const currentUser = await UsersService.getCurrentUser()
+    const body = await request.json()
+
+    // Prioriza user_id do body, depois tenta sessão do servidor
+    let currentUser = null
+    if (body.user_id) {
+      currentUser = await UsersService.getUserById(body.user_id)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
+    }
 
     if (!currentUser) {
       return NextResponse.json(

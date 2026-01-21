@@ -20,14 +20,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Tenta pegar usuário da sessão, senão usa o user_id do body
-    let currentUser = await UsersService.getCurrentUser()
-    console.log('getCurrentUser result:', currentUser ? 'found' : 'null')
-    
-    if (!currentUser && body.user_id) {
-      console.log('Trying fallback with user_id:', body.user_id)
+    // Prioriza user_id do body, depois tenta sessão do servidor
+    let currentUser = null
+    if (body.user_id) {
+      console.log('Trying user_id from body:', body.user_id)
       currentUser = await UsersService.getUserById(body.user_id)
       console.log('getUserById result:', currentUser ? 'found' : 'null')
+    }
+    
+    if (!currentUser) {
+      console.log('Falling back to getCurrentUser')
+      currentUser = await UsersService.getCurrentUser()
+      console.log('getCurrentUser result:', currentUser ? 'found' : 'null')
     }
 
     if (!currentUser) {

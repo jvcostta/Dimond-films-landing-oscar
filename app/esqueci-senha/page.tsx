@@ -20,7 +20,8 @@ export default function EsqueciSenhaPage() {
     setIsLoading(true)
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const sanitizedEmail = email.trim().toLowerCase()
+      const { error } = await supabase.auth.resetPasswordForEmail(sanitizedEmail, {
         redirectTo: `${window.location.origin}/redefinir-senha`,
       })
 
@@ -35,7 +36,7 @@ export default function EsqueciSenhaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Botão Voltar */}
         <Link href="/" className="inline-flex items-center gap-2 text-white/60 hover:text-white mb-6 transition-colors">
@@ -44,7 +45,7 @@ export default function EsqueciSenhaPage() {
         </Link>
 
         {/* Card Principal */}
-        <div className="bg-black/60 backdrop-blur-sm rounded-2xl border border-white/10 p-8">
+        <div className="bg-black/60 backdrop-blur-sm rounded-2xl border border-[#ffcc33]/30 p-8">
           {!emailEnviado ? (
             <>
               <div className="text-center mb-6">

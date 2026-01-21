@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase/client'
@@ -53,6 +53,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         // Usuário fez login ou token foi renovado
         await refreshUser()
+        try {
+          const started = localStorage.getItem('auth_login_start')
+          const dest = localStorage.getItem('auth_login_dest')
+          if (started === 'true') {
+            localStorage.removeItem('auth_login_start')
+            localStorage.removeItem('auth_login_dest')
+            if (dest) {
+              // Rola para a seção desejada após autenticação
+              const hash = dest.startsWith('#') ? dest : `#${dest}`
+              // Defer to ensure DOM is ready
+              setTimeout(() => {
+                try {
+                  if (typeof window !== 'undefined') {
+                    if (!window.location.hash || window.location.hash !== hash) {
+                      window.location.hash = hash
+                    }
+                    const el = document.getElementById(hash.replace('#', ''))
+                    el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }
+                } catch {}
+              }, 50)
+            }
+          }
+        } catch {}
       } else if (event === 'SIGNED_OUT') {
         // Usuário fez logout
         setUser(null)
@@ -65,51 +89,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const login = async (email: string, password: string) => {
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
+  const login = async (_email: string, _password: string) => {
+    // Marca início do fluxo para pós-login rolar até a seção
+    localStorage.setItem('auth_login_start', 'true')
+    localStorage.setItem('auth_login_dest', 'meu-palpite')
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Erro ao fazer login')
-      }
-
-      const data = await response.json()
-      setUser(data.user)
-      localStorage.setItem('user', JSON.stringify(data.user))
-    } catch (error: any) {
-      throw error
+    const email = _email.trim().toLowerCase()
+    const password = _password
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw new Error(error.message)
+    if (data?.user) {
+      await refreshUser()
     }
   }
 
-  const signup = async (userData: any) => {
-    try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
-      })
+  const signup = async (_data: any) => {
+    // Marca início do fluxo para pós-confirmação rolar até a seção
+    localStorage.setItem('auth_login_start', 'true')
+    localStorage.setItem('auth_login_dest', 'meu-palpite')
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Erro ao criar conta')
-      }
+    const origin = typeof window !== 'undefined' ? window.location.origin : ''
+    const emailRedirectTo = origin ? `${origin}/auth/callback?dest=%23meu-palpite` : undefined
 
-      const data = await response.json()
-      setUser(data.user)
-      localStorage.setItem('user', JSON.stringify(data.user))
-    } catch (error: any) {
-      throw error
-    }
+    const sanitizedEmail = (_data.email || '').trim().toLowerCase()
+    const { error } = await supabase.auth.signUp({
+      email: sanitizedEmail,
+      password: _data.password,
+      options: {
+        emailRedirectTo,
+        data: {
+          name: _data.name,
+          phone: _data.phone,
+          state: _data.state,
+          city: _data.city,
+          birth_date: _data.birth_date,
+          favorite_genre: _data.favorite_genre,
+          cinema_network: _data.cinema_network,
+        },
+      },
+    })
+    if (error) throw new Error(error.message)
   }
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' })
+      await supabase.auth.signOut()
     } catch (error) {
       console.error('Erro ao fazer logout:', error)
     } finally {
@@ -129,16 +153,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      const response = await fetch('/api/auth/me')
-      if (response.ok) {
-        const data = await response.json()
-        setUser(data.user)
-        localStorage.setItem('user', JSON.stringify(data.user))
-      } else {
-        // Se a API falhou mas há sessão, limpa tudo
-        setUser(null)
-        localStorage.removeItem('user')
+      // Mapeia usuário diretamente do Supabase
+      const supaUser = session.user
+      const mapped: User = {
+        id: supaUser.id,
+        name: (supaUser.user_metadata?.name as string) || supaUser.email?.split('@')[0] || 'Usuário',
+        email: supaUser.email || '',
+        city: supaUser.user_metadata?.city,
+        state: supaUser.user_metadata?.state,
+        email_confirmed_at: (supaUser.email_confirmed_at as string | null) || null,
       }
+      setUser(mapped)
+      localStorage.setItem('user', JSON.stringify(mapped))
+
+      // Garante que exista registro correspondente na tabela 'users'
+      try {
+        await fetch('/api/users/upsert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            auth_id: mapped.id,
+            name: mapped.name,
+            email: mapped.email,
+            state: mapped.state ?? null,
+            city: mapped.city ?? null,
+          }),
+        })
+      } catch {}
     } catch (error) {
       console.error('Erro ao recarregar usuário:', error)
       setUser(null)

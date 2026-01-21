@@ -42,11 +42,14 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    // Tenta pegar usuário autenticado
-    let currentUser = await UsersService.getCurrentUser()
-    
-    if (!currentUser && body.user_id) {
+    // Prioriza user_id do body, depois tenta sessão do servidor
+    let currentUser = null
+    if (body.user_id) {
       currentUser = await UsersService.getUserById(body.user_id)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
     }
 
     if (!currentUser) {

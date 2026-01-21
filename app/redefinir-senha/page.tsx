@@ -84,16 +84,16 @@ export default function RedefinirSenhaPage() {
 
   if (!isValidSession && !error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white">Verificando...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-black/60 backdrop-blur-sm rounded-2xl border border-white/10 p-8">
+        <div className="bg-black/60 backdrop-blur-sm rounded-2xl border border-[#ffcc33]/30 p-8">
           {!senhaRedefinida ? (
             <>
               <div className="text-center mb-6">

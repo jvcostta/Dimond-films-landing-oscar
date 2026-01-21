@@ -12,11 +12,14 @@ export async function GET(request: NextRequest) {
     const bolaoId = searchParams.get('bolao_id')
     const userId = searchParams.get('user_id')
 
-    // Tenta pegar usuário da sessão, senão usa o user_id do query param
-    let currentUser = await UsersService.getCurrentUser()
-    
-    if (!currentUser && userId) {
+    // Prioriza user_id da query, depois tenta sessão do servidor
+    let currentUser = null
+    if (userId) {
       currentUser = await UsersService.getUserById(userId)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
     }
 
     if (!currentUser) {
@@ -65,11 +68,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { bolao_id, answer } = body
 
-    // Tenta pegar usuário da sessão, senão usa o user_id do body
-    let currentUser = await UsersService.getCurrentUser()
-    
-    if (!currentUser && body.user_id) {
+    // Prioriza user_id do body, depois tenta sessão do servidor
+    let currentUser = null
+    if (body.user_id) {
       currentUser = await UsersService.getUserById(body.user_id)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
     }
 
     if (!currentUser) {

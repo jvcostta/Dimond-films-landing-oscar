@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,6 +23,7 @@ interface GameModeSelectorProps {
 
 export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
   const { user, refreshUser } = useAuth()
+  const router = useRouter()
   const [selectedMode, setSelectedMode] = useState<"individual" | "group" | null>(null)
   const [groupAction, setGroupAction] = useState<"create" | "join" | null>(null)
   const [groupName, setGroupName] = useState("")
@@ -37,18 +39,10 @@ export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
     setError("")
     try {
       await refreshUser()
-      const response = await fetch('/api/auth/me')
-      if (response.ok) {
-        const data = await response.json()
-        if (data.user.email_confirmed_at) {
-          setShowEmailAlert(false)
-          // Força atualização do contexto
-          setTimeout(() => window.location.reload(), 500)
-        } else {
-          setError('Email ainda não foi confirmado. Verifique sua caixa de entrada.')
-        }
+      if (user?.email_confirmed_at) {
+        setShowEmailAlert(false)
       } else {
-        setError('Erro ao verificar confirmação. Tente novamente.')
+        setError('Email ainda não foi confirmado. Verifique sua caixa de entrada.')
       }
     } catch (err) {
       console.error('Erro ao verificar email:', err)
@@ -84,7 +78,7 @@ export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
           body: JSON.stringify({
             name: selectedMode === "individual" ? `Bolão de ${user.name}` : groupName,
             type: selectedMode,
-            creator_id: user.id,
+            user_id: user.id,
           }),
         })
 
@@ -97,7 +91,9 @@ export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
         if (selectedMode === "individual") {
           onSelect("individual", data.bolao.id)
         } else if (selectedMode === "group") {
-          onSelect("group", data.bolao.id, data.bolao.invite_code)
+          // Para grupo, passa o código do convite e chama onSelect
+          const code = data.inviteCode || data.bolao.invite_code
+          onSelect("group", data.bolao.id, code)
         }
       } else if (selectedMode === "group" && groupAction === "join") {
         // Entrar em um bolão existente usando invite_code
@@ -263,7 +259,7 @@ export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
                       : "border-white/20 bg-white/5 hover:border-white/40"
                   }`}
                 >
-                  <h4 className="text-lg font-medium mb-2">Iniciar Palpite</h4>
+                  <h4 className="text-lg font-medium mb-2">Iniciar Bolão</h4>
                   <p className="text-sm text-white/60">Crie um novo bolão e compartilhe o código</p>
                 </button>
 
@@ -398,7 +394,7 @@ export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
                 {/* Prize info */}
                 <div className="bg-amber-400/10 border border-amber-400/30 rounded-sm p-4">
                   <p className="text-center text-sm font-medium">
-                    🎯 Os prêmios são concedidos somente ao 1º colocado do <span className="text-amber-400 font-bold">Ranking Geral</span>.
+                    Os prêmios são concedidos somente ao 1º colocado do <span className="text-amber-400 font-bold">Ranking Geral</span>.
                   </p>
                 </div>
               </div>

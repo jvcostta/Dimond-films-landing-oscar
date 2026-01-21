@@ -1,196 +1,156 @@
 "use client"
 
-import { useState, useRef, Suspense } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/contexts/auth-context"
 import { Navbar } from "@/components/navbar"
 import { HeroSection } from "@/components/hero-section"
 import { HowItWorks } from "@/components/how-it-works"
-import { RegistrationForm } from "@/components/registration-form"
+import { PrizeSection } from "@/components/prize-section"
+import { useAuth } from "@/contexts/auth-context"
+import { Button } from "@/components/ui/button"
 import { LoginForm } from "@/components/login-form"
+import { RegistrationForm } from "@/components/registration-form"
+import { useState } from "react"
+import { OscarNominations } from "@/components/oscar-nominations"
 import { GameModeSelector } from "@/components/game-mode-selector"
 import { OscarQuiz } from "@/components/oscar-quiz"
 import { ConfirmationScreen } from "@/components/confirmation-screen"
-import { RankingSection } from "@/components/ranking-section"
-import { PrizeSection } from "@/components/prize-section"
-import { OscarNominations } from "@/components/oscar-nominations"
-import { EmailConfirmationHandler } from "@/components/email-confirmation-handler"
-
-type Step = "registration" | "game-mode" | "quiz" | "confirmation"
-type GameMode = "individual" | "group"
 
 export default function Home() {
-  const { user } = useAuth()
-  const router = useRouter()
-  const [step, setStep] = useState<Step>("registration")
-  const [gameMode, setGameMode] = useState<GameMode | null>(null)
-  const [bolaoId, setBolaoId] = useState<string>("")
-  const [userData, setUserData] = useState<any>(null)
-  const [inviteCode, setInviteCode] = useState<string>("")
-  const [showLogin, setShowLogin] = useState(false)
+  const { user, isLoading } = useAuth()
+  const [mode, setMode] = useState<'login' | 'signup'>('login')
+  const [selectedGameMode, setSelectedGameMode] = useState<null | 'individual' | 'group'>(null)
+  const [currentBolaoId, setCurrentBolaoId] = useState<string | null>(null)
+  const [inviteCode, setInviteCode] = useState<string | undefined>(undefined)
   const [showConfirmation, setShowConfirmation] = useState(false)
-  const [confirmationStatus, setConfirmationStatus] = useState<'none' | 'pending' | 'success'>('none')
-  const formSectionRef = useRef<HTMLDivElement>(null)
-
-  const handleEmailConfirmed = () => {
-    setShowConfirmation(true)
-    setConfirmationStatus('success')
-    setShowLogin(true)
-    
-    // Scroll para o formulário após 100ms
-    setTimeout(() => {
-      scrollToForm()
-    }, 100)
-    
-    // Remove a mensagem após 5 segundos
-    setTimeout(() => {
-      setShowConfirmation(false)
-    }, 5000)
-  }
+  const [showEmailAlert, setShowEmailAlert] = useState(false)
 
   const scrollToForm = () => {
-    // Sempre rola até o formulário
-    formSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-    
-    // Se usuário estiver logado e estiver na tela de registration, muda para game-mode
-    if (user && step === "registration") {
-      setStep("game-mode")
-    }
-  }
-
-  const handleRegistration = (data: any) => {
-    setUserData(data)
-    // Após cadastro, direciona para login e avisa sobre confirmação de email
-    setShowLogin(true)
-    setShowConfirmation(true)
-    setConfirmationStatus('pending')
-    // Mantém na etapa de registro para exibir o LoginForm
-    setStep("registration")
-    // Scroll até o formulário
-    setTimeout(() => {
-      formSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-    }, 100)
-    // Oculta mensagem após alguns segundos
-    setTimeout(() => {
-      setShowConfirmation(false)
-    }, 5000)
-  }
-
-  const handleGameMode = (mode: GameMode, id: string, code?: string) => {
-    setGameMode(mode)
-    setBolaoId(id)
-    if (code) setInviteCode(code)
-    
-    // Se for individual, vai para quiz (fazer palpites)
-    // Se for grupo, pula o quiz e vai direto para confirmation (palpites já copiados)
-    if (mode === "individual") {
-      setStep("quiz")
-    } else {
-      setStep("confirmation")
-    }
-  }
-
-  const handleQuizComplete = () => {
-    setStep("confirmation")
-  }
-
-  const handleBackToHome = () => {
-    setStep("registration")
-    setGameMode(null)
-    setBolaoId("")
-    setUserData(null)
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    const el = document.getElementById('meu-palpite')
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
     <main className="min-h-screen bg-black text-white overflow-x-hidden w-full">
-      {/* Handler de confirmação de email */}
-      <Suspense fallback={null}>
-        <EmailConfirmationHandler onConfirmed={handleEmailConfirmed} />
-      </Suspense>
-      
       <Navbar />
-      
+
       <HeroSection onStart={scrollToForm} />
-      
+
       <div id="como-funciona">
         <HowItWorks onStart={scrollToForm} />
       </div>
-      
-      {/* Ranking Geral - Temporariamente oculto */}
-      <div id="ranking-geral" className="hidden">
-        <RankingSection onStart={scrollToForm} />
-      </div>
-      
+
       <div id="premio-oficial">
         <PrizeSection onStart={scrollToForm} />
       </div>
 
-      {/* Forms Section */}
-      <div id="meu-palpite" ref={formSectionRef} className="scroll-mt-20">
-        {!user && step === "registration" && (
-          <>
-            {showLogin ? (
-              <div className="py-16 px-4">
-                {/* Mensagem de confirmação de email */}
-                {showConfirmation && (
-                  <div className={`max-w-md mx-auto mb-6 p-4 rounded-lg text-center border ${confirmationStatus === 'success' ? 'bg-green-500/20 border-green-500/50' : 'bg-amber-500/20 border-amber-500/50'}`}>
-                    <p className={confirmationStatus === 'success' ? 'text-green-400 font-medium' : 'text-amber-300 font-medium'}>
-                      {confirmationStatus === 'success'
-                        ? '✓ Email confirmado com sucesso! Faça login para continuar.'
-                        : 'Enviamos um link de confirmação para seu email. Confirme seu email e faça login para continuar.'}
-                    </p>
+
+      <section id="meu-palpite" className="scroll-mt-20 py-24 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          {!user ? (
+            <div className="bg-black/60 border border-white/10 rounded-xl p-8">
+              <h2 className="text-2xl font-semibold mb-2">Entre para participar do bolão</h2>
+              <p className="text-white/70 mb-6">Faça login ou crie sua conta para liberar seus palpites e participar dos rankings.</p>
+
+              {/* Email/Password */}
+              {mode === 'login' ? (
+                <>
+                  {showEmailAlert && (
+                    <div className="mb-6 p-4 bg-amber-400/10 border border-amber-400/30 rounded-lg text-left">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-5 h-5 mt-0.5">
+                          <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-amber-400 font-semibold mb-1">Confirme seu email</h3>
+                          <p className="text-white/80 text-sm">
+                            Enviamos um link de confirmação para seu email. Por favor, clique no link antes de fazer login.
+                          </p>
+                          <button
+                            onClick={() => setShowEmailAlert(false)}
+                            className="text-amber-400/70 hover:text-amber-400 text-xs mt-2 underline"
+                          >
+                            Dispensar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <LoginForm onSuccess={() => setMode('login')} />
+                  <div className="text-center mt-4">
+                    <button
+                      className="text-sm text-[#ffcc33] hover:text-[#ffcc33]/80"
+                      onClick={() => setMode('signup')}
+                    >
+                      Não tem conta? Criar conta
+                    </button>
                   </div>
-                )}
-                
-                <LoginForm onSuccess={() => {
-                  setStep("game-mode")
-                  setTimeout(() => {
-                    formSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-                  }, 100)
-                }} />
-                <div className="text-center mt-6">
-                  <button
-                    onClick={() => setShowLogin(false)}
-                    className="text-[#ffcc33] hover:underline text-sm"
-                  >
-                    Não tem uma conta? Cadastre-se aqui
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <RegistrationForm onComplete={handleRegistration} onBack={handleBackToHome} />
-                <div className="text-center py-6">
-                  <button
-                    onClick={() => setShowLogin(true)}
-                    className="text-white hover:underline text-sm"
-                  >
-                    Já tem uma conta existente? <span className="text-[#ffcc33]">Clique aqui</span> para fazer login
-                  </button>
-                </div>
-                <OscarNominations />
-              </>
-            )}
-          </>
-        )}
+                </>
+              ) : (
+                <>
+                  <RegistrationForm 
+                    onComplete={() => {
+                      setMode('login')
+                      setShowEmailAlert(true)
+                    }} 
+                    onBack={() => setMode('login')} 
+                  />
+                  <div className="text-center mt-4">
+                    <button
+                      className="text-sm text-[#ffcc33] hover:text-[#ffcc33]/80"
+                      onClick={() => setMode('login')}
+                    >
+                      Já tenho conta — Fazer login
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <div>
+              {showConfirmation ? (
+                <ConfirmationScreen
+                  gameMode={selectedGameMode}
+                  inviteCode={inviteCode}
+                  onBack={() => {
+                    setShowConfirmation(false)
+                    setSelectedGameMode(null)
+                    setCurrentBolaoId(null)
+                    setInviteCode(undefined)
+                  }}
+                />
+              ) : !currentBolaoId ? (
+                <GameModeSelector
+                  onSelect={(modeSel, bolaoId, code) => {
+                    setSelectedGameMode(modeSel)
+                    setCurrentBolaoId(bolaoId)
+                    setInviteCode(code)
+                    
+                    // Se for grupo (criar ou entrar), vai direto pra confirmação
+                    if (modeSel === 'group') {
+                      setShowConfirmation(true)
+                    }
+                    // Se for individual, vai pro quiz primeiro
+                  }}
+                  onBack={() => setSelectedGameMode(null)}
+                />
+              ) : (
+                <OscarQuiz
+                  bolaoId={currentBolaoId}
+                  onComplete={() => {
+                    // Após completar o quiz individual, mostra a tela de confirmação
+                    setShowConfirmation(true)
+                  }}
+                  onBack={() => setCurrentBolaoId(null)}
+                />
+              )}
+            </div>
+          )}
+        </div>
+      </section>
 
-        {(step === "game-mode" || (user && step === "registration")) && (
-          <GameModeSelector 
-            onSelect={handleGameMode} 
-            onBack={() => {
-              if (user) {
-                router.push('/meus-palpites')
-              } else {
-                handleBackToHome()
-              }
-            }} 
-          />
-        )}
-
-        {step === "quiz" && bolaoId && <OscarQuiz bolaoId={bolaoId} onComplete={handleQuizComplete} onBack={handleBackToHome} />}
-
-        {step === "confirmation" && <ConfirmationScreen gameMode={gameMode} inviteCode={inviteCode} onBack={handleBackToHome} />}
+      <div id="filmes-indicados">
+        <OscarNominations />
       </div>
     </main>
   )

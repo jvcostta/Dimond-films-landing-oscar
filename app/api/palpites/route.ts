@@ -13,11 +13,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('user_id')
 
-    // Tenta pegar usuário da sessão, senão usa o user_id do query param
-    let currentUser = await UsersService.getCurrentUser()
-    
-    if (!currentUser && userId) {
+    // Prioriza user_id da query, depois tenta sessão do servidor
+    let currentUser = null
+    if (userId) {
       currentUser = await UsersService.getUserById(userId)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
     }
 
     if (!currentUser) {
@@ -47,11 +50,14 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    // Tenta pegar usuário da sessão, senão usa o user_id do body
-    let currentUser = await UsersService.getCurrentUser()
-    
-    if (!currentUser && body.user_id) {
+    // Prioriza user_id do body, depois tenta sessão do servidor
+    let currentUser = null
+    if (body.user_id) {
       currentUser = await UsersService.getUserById(body.user_id)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
     }
 
     if (!currentUser) {
@@ -143,7 +149,17 @@ export async function POST(request: NextRequest) {
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const currentUser = await UsersService.getCurrentUser()
+    const body = await request.json()
+
+    // Prioriza user_id do body, depois tenta sessão do servidor
+    let currentUser = null
+    if (body.user_id) {
+      currentUser = await UsersService.getUserById(body.user_id)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
+    }
 
     if (!currentUser) {
       return NextResponse.json(
@@ -151,8 +167,6 @@ export async function PATCH(request: NextRequest) {
         { status: 401 }
       )
     }
-
-    const body = await request.json()
 
     if (!body.id || !body.nominee_id) {
       return NextResponse.json(

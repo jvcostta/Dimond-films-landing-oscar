@@ -143,14 +143,13 @@ export function OscarQuiz({ bolaoId, onComplete, onBack }: OscarQuizProps) {
 
         if (!tiebreakerResponse.ok) {
           const errorData = await tiebreakerResponse.json()
-          console.error('Erro ao salvar tiebreaker:', errorData)
           // Não interrompe o fluxo se falhar o tiebreaker
         }
       }
 
+      // Chama onComplete para mostrar a tela de confirmação
       onComplete()
     } catch (err: any) {
-      console.error('Erro ao salvar palpites:', err)
       setError(err.message || "Erro ao salvar palpites")
     } finally {
       setIsSaving(false)

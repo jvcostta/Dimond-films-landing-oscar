@@ -12,11 +12,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const userIdFromQuery = searchParams.get('userId')
 
-    // Tenta pegar usuário autenticado, ou usa userId da query como fallback
-    let currentUser = await UsersService.getCurrentUser()
-    
-    if (!currentUser && userIdFromQuery) {
+    // Prioriza userId da query, depois tenta sessão do servidor
+    let currentUser = null
+    if (userIdFromQuery) {
       currentUser = await UsersService.getUserById(userIdFromQuery)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
     }
 
     if (!currentUser) {
@@ -61,11 +64,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Tenta pegar o usuário autenticado, ou usa creator_id do body como fallback
-    let currentUser = await UsersService.getCurrentUser()
+    // Prioriza creator_id ou user_id do body, depois tenta sessão do servidor
+    let currentUser = null
+    const userId = body.creator_id || body.user_id
     
-    if (!currentUser && body.creator_id) {
-      currentUser = await UsersService.getUserById(body.creator_id)
+    if (userId) {
+      currentUser = await UsersService.getUserById(userId)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
     }
 
     if (!currentUser) {

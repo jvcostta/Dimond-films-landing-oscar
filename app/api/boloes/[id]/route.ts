@@ -14,7 +14,18 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const currentUser = await UsersService.getCurrentUser()
+    const { searchParams } = new URL(request.url)
+    const userIdFromQuery = searchParams.get('user_id')
+
+    // Prioriza user_id da query, depois tenta sessão do servidor
+    let currentUser = null
+    if (userIdFromQuery) {
+      currentUser = await UsersService.getUserById(userIdFromQuery)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
+    }
 
     if (!currentUser) {
       return NextResponse.json(
@@ -65,7 +76,18 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const currentUser = await UsersService.getCurrentUser()
+    const { searchParams } = new URL(request.url)
+    const userIdFromQuery = searchParams.get('user_id')
+
+    // Prioriza user_id da query, depois tenta sessão do servidor
+    let currentUser = null
+    if (userIdFromQuery) {
+      currentUser = await UsersService.getUserById(userIdFromQuery)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
+    }
 
     if (!currentUser) {
       return NextResponse.json(

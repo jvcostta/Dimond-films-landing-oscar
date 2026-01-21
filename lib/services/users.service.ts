@@ -27,42 +27,106 @@ export class UsersService {
 
   /**
    * Busca usuário pelo ID do Supabase Auth
+   * Se não encontrar, tenta migrar usuário antigo por email
    */
   static async getUserByAuthId(authId: string): Promise<User | null> {
     const supabase = await createServerSupabaseClient()
 
-    const { data: user, error } = await supabase
+    let { data: user, error } = await supabase
       .from('users')
       .select('*')
       .eq('auth_id', authId)
       .single()
 
-    if (error) {
-      console.error('Error fetching user:', error)
-      return null
+    if (user) {
+      return user
     }
 
-    return user
+    // Fallback: busca por email e atualiza auth_id (migração de usuários antigos)
+    try {
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (authUser?.email) {
+        const { data: oldUser } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', authUser.email)
+          .single()
+
+        if (oldUser && oldUser.auth_id !== authId) {
+          const { data: updatedUser } = await supabase
+            .from('users')
+            .update({ auth_id: authId })
+            .eq('id', oldUser.id)
+            .select()
+            .single()
+
+          return updatedUser || oldUser
+        }
+      }
+    } catch (migrationError) {
+      console.error('[getUserByAuthId] Erro na migração automática:', migrationError)
+    }
+
+    return null
   }
 
   /**
    * Busca usuário pelo ID
+   * Se não encontrar, tenta buscar por auth_id (fallback para clientes que enviam auth_id como user_id)
+   * Se ainda não encontrar, tenta atualizar auth_id de usuários antigos usando email
    */
   static async getUserById(id: string): Promise<User | null> {
     const supabase = await createServerSupabaseClient()
 
-    const { data: user, error } = await supabase
+    // Tenta buscar por ID primeiro
+    let { data: user, error } = await supabase
       .from('users')
       .select('*')
       .eq('id', id)
       .single()
 
-    if (error) {
-      console.error('Error fetching user:', error)
-      return null
+    if (user) {
+      return user
+    }
+    
+    // Fallback: tenta buscar por auth_id (caso o cliente tenha enviado auth_id como user_id)
+    const { data: userByAuthId, error: authError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('auth_id', id)
+      .single()
+
+    if (userByAuthId) {
+      return userByAuthId
     }
 
-    return user
+    // Fallback final: tenta encontrar e migrar usuários antigos por email
+    try {
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (authUser?.email) {
+        const { data: oldUser, error: emailError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', authUser.email)
+          .single()
+
+        if (oldUser) {
+          // Atualiza o auth_id do usuário antigo para o novo
+          const { data: updatedUser } = await supabase
+            .from('users')
+            .update({ auth_id: authUser.id })
+            .eq('id', oldUser.id)
+            .select()
+            .single()
+
+          return updatedUser || oldUser
+        }
+      }
+    } catch (migrationError) {
+      console.error('[getUserById] Erro na migração automática:', migrationError)
+    }
+
+    return null
   }
 
   /**

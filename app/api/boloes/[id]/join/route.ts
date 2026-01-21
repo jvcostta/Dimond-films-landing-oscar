@@ -14,7 +14,18 @@ interface RouteParams {
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const currentUser = await UsersService.getCurrentUser()
+    const { id } = params
+    const body = await request.json()
+
+    // Prioriza user_id do body, depois tenta sessão do servidor
+    let currentUser = null
+    if (body.user_id) {
+      currentUser = await UsersService.getUserById(body.user_id)
+    }
+    
+    if (!currentUser) {
+      currentUser = await UsersService.getCurrentUser()
+    }
 
     if (!currentUser) {
       return NextResponse.json(
@@ -22,9 +33,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         { status: 401 }
       )
     }
-
-    const { id } = params
-    const body = await request.json()
 
     let bolao
 
