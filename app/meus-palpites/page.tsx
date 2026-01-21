@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Trophy, Users, TrendingUp, ChevronDown, ArrowLeft, Menu, X, Mail, Eye, List } from 'lucide-react'
+import { Trophy, Users, TrendingUp, ChevronDown, ArrowLeft, Menu, X, Mail, Eye, List, Copy, Check } from 'lucide-react'
 
 type Palpite = {
   id: string
@@ -64,6 +64,7 @@ type ModalState = {
   type: 'palpite' | 'ranking-grupo' | 'ranking-geral' | null
   bolaoId?: string
   bolaoName?: string
+  bolaoInviteCode?: string
   palpites?: Palpite[]
 }
 
@@ -82,6 +83,7 @@ export default function MeusPalpitesPage() {
   const [rankingData, setRankingData] = useState<RankingEntry[]>([])
   const [isLoadingRanking, setIsLoadingRanking] = useState(false)
   const [bolaoPositions, setBolaoPositions] = useState<Record<string, { position: number; isGroup: boolean }>>({})
+  const [copiedCode, setCopiedCode] = useState(false)
 
   useEffect(() => {
     if (!user) {
@@ -263,6 +265,28 @@ export default function MeusPalpitesPage() {
       console.error('Erro ao buscar ranking geral:', error)
     } finally {
       setIsLoadingRanking(false)
+    }
+  }
+
+  const handleOpenCodigoGrupoModal = (bolao: BolaoWithPalpites) => {
+    setModalState({
+      type: 'codigo-grupo',
+      bolaoId: bolao.id,
+      bolaoName: bolao.name,
+      bolaoInviteCode: bolao.invite_code
+    })
+    setCopiedCode(false)
+  }
+
+  const handleCopyCode = async () => {
+    if (modalState.bolaoInviteCode) {
+      try {
+        await navigator.clipboard.writeText(modalState.bolaoInviteCode)
+        setCopiedCode(true)
+        setTimeout(() => setCopiedCode(false), 2000)
+      } catch (error) {
+        console.error('Erro ao copiar código:', error)
+      }
     }
   }
 
@@ -512,14 +536,24 @@ export default function MeusPalpitesPage() {
                             Ver Palpite
                           </Button>
                           {bolao.type === 'group' && (
-                            <Button
-                              onClick={() => handleOpenRankingGrupoModal(bolao)}
-                              size="sm"
-                              className="w-full md:w-auto bg-white/5 text-white border border-blue-400 hover:bg-white/10 gap-2 text-xs md:text-sm justify-center"
-                            >
-                              <Users className="w-3 h-3 md:w-4 md:h-4 text-blue-400" />
-                              Ver Ranking do Grupo
-                            </Button>
+                            <>
+                              <Button
+                                onClick={() => handleOpenRankingGrupoModal(bolao)}
+                                size="sm"
+                                className="w-full md:w-auto bg-white/5 text-white border border-blue-400 hover:bg-white/10 gap-2 text-xs md:text-sm justify-center"
+                              >
+                                <Users className="w-3 h-3 md:w-4 md:h-4 text-blue-400" />
+                                Ver Ranking do Grupo
+                              </Button>
+                              <Button
+                                onClick={() => handleOpenCodigoGrupoModal(bolao)}
+                                size="sm"
+                                className="w-full md:w-auto bg-white/5 text-white border border-green-400 hover:bg-white/10 gap-2 text-xs md:text-sm justify-center"
+                              >
+                                <Copy className="w-3 h-3 md:w-4 md:h-4 text-green-400" />
+                                Ver Código do Grupo
+                              </Button>
+                            </>
                           )}
                           <Button
                             onClick={() => handleOpenRankingGeralModal(bolao)}
@@ -772,7 +806,73 @@ export default function MeusPalpitesPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Modal: Ver Código do Grupo */}
+      <Dialog open={modalState.type === 'codigo-grupo'} onOpenChange={closeModal}>
+        <DialogContent className="bg-gradient-to-br from-gray-900 to-black border border-green-400/30 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-white flex items-center gap-2">
+              <Users className="w-6 h-6 text-green-400" />
+              Código do Grupo
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-6 space-y-6">
+            {/* Nome do grupo */}
+            <div className="space-y-2">
+              <label className="text-sm text-white/60 font-medium">Nome do Grupo</label>
+              <div className="bg-white/5 border border-white/20 rounded-sm p-4">
+                <p className="text-white font-semibold text-lg">{modalState.bolaoName}</p>
+              </div>
+            </div>
+
+            {/* Código do grupo */}
+            <div className="space-y-2">
+              <label className="text-sm text-white/60 font-medium">Código de Convite</label>
+              <div className="bg-green-400/10 border-2 border-green-400/30 rounded-sm p-4 flex items-center justify-between gap-3">
+                <code className="text-green-400 font-mono font-bold text-xl tracking-wider">
+                  {modalState.bolaoInviteCode || 'N/A'}
+                </code>
+                <Button
+                  onClick={handleCopyCode}
+                  size="sm"
+                  className={`${
+                    copiedCode 
+                      ? 'bg-green-500 hover:bg-green-500' 
+                      : 'bg-green-400 hover:bg-green-500'
+                  } text-black transition-all duration-200`}
+                >
+                  {copiedCode ? (
+                    <>
+                      <Check className="w-4 h-4 mr-1" />
+                      Copiado!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 mr-1" />
+                      Copiar
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Instruções */}
+            <div className="bg-white/5 border border-white/10 rounded-sm p-4">
+              <p className="text-white/70 text-sm leading-relaxed">
+                Compartilhe este código com seus amigos para que eles possam entrar no seu grupo. 
+                Eles precisarão inserir este código ao criar sua conta ou na tela de seleção de modo de jogo.
+              </p>
+            </div>
+
+            <Button
+              onClick={closeModal}
+              className="w-full bg-white/10 text-white hover:bg-white/20 border border-white/20"
+            >
+              Fechar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
-

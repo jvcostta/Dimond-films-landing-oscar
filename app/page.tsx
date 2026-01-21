@@ -8,20 +8,30 @@ import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
 import { LoginForm } from "@/components/login-form"
 import { RegistrationForm } from "@/components/registration-form"
-import { useState } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { OscarNominations } from "@/components/oscar-nominations"
 import { GameModeSelector } from "@/components/game-mode-selector"
 import { OscarQuiz } from "@/components/oscar-quiz"
 import { ConfirmationScreen } from "@/components/confirmation-screen"
+import { useSearchParams } from "next/navigation"
 
-export default function Home() {
+function HomeContent() {
   const { user, isLoading } = useAuth()
-  const [mode, setMode] = useState<'login' | 'signup'>('login')
+  const searchParams = useSearchParams()
+  const [mode, setMode] = useState<'login' | 'signup'>('signup')
   const [selectedGameMode, setSelectedGameMode] = useState<null | 'individual' | 'group'>(null)
   const [currentBolaoId, setCurrentBolaoId] = useState<string | null>(null)
   const [inviteCode, setInviteCode] = useState<string | undefined>(undefined)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [showEmailAlert, setShowEmailAlert] = useState(false)
+
+  // Verifica se veio do link de confirmação de email
+  useEffect(() => {
+    if (searchParams.get('confirmed') === 'true' || searchParams.get('from') === 'email-confirmation') {
+      setMode('login')
+      setShowEmailAlert(true)
+    }
+  }, [searchParams])
 
   const scrollToForm = () => {
     const el = document.getElementById('meu-palpite')
@@ -153,5 +163,13 @@ export default function Home() {
         <OscarNominations />
       </div>
     </main>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <HomeContent />
+    </Suspense>
   )
 }

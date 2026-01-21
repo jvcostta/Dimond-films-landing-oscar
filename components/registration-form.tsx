@@ -46,6 +46,49 @@ const citiesByState: Record<string, string[]> = {
   TO: ["Palmas", "Araguaína", "Gurupi", "Porto Nacional", "Paraíso do Tocantins", "Colinas do Tocantins", "Guaraí"],
 }
 
+// Função para enviar dados para o RD Station
+async function submitToRDStation(data: {
+  name: string
+  email: string
+  phone: string
+  state: string
+  city: string
+  favoriteGenre: string
+  cinemaNetwork: string
+}): Promise<void> {
+  const supabaseUrl = "https://iivranwwjcdborsfnfay.supabase.co"
+  if (!supabaseUrl) return
+
+  const payload = {
+    name: data.name,
+    email: data.email,
+    mobile_phone: data.phone.replace(/\D/g, ''),
+    state: data.state,
+    city: data.city,
+    cf_genero_favorito: data.favoriteGenre,
+    cf_rede_de_cinema_favorita: data.cinemaNetwork,
+    tags: ['diamond_oscar_2025', 'bolao_oscar'],
+  }
+
+  try {
+    const response = await fetch(`${supabaseUrl}/functions/v1/sendCRMData`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to submit to RD Station')
+    }
+  } catch (error) {
+    console.error('Erro ao enviar dados para RD Station:', error)
+    // Não bloqueia o fluxo se falhar o envio para o CRM
+  }
+}
+
 export function RegistrationForm({ onComplete, onBack }: RegistrationFormProps) {
   const { signup } = useAuth()
   const [step, setStep] = useState<1 | 2>(1)
@@ -101,6 +144,7 @@ export function RegistrationForm({ onComplete, onBack }: RegistrationFormProps) 
     setIsLoading(true)
 
     try {
+      // Cria a conta no Supabase
       await signup({
         name: formData.name,
         email: formData.email,
@@ -112,6 +156,20 @@ export function RegistrationForm({ onComplete, onBack }: RegistrationFormProps) 
         favorite_genre: formData.favoriteGenre,
         cinema_network: formData.cinemaNetwork,
       })
+      
+      // Envia os dados para o RD Station (em paralelo, sem bloquear)
+      submitToRDStation({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        state: formData.state,
+        city: formData.city,
+        favoriteGenre: formData.favoriteGenre,
+        cinemaNetwork: formData.cinemaNetwork,
+      }).catch((err) => {
+        console.error('Erro no envio ao CRM:', err)
+      })
+      
       // Cadastro concluído, chama onComplete
       onComplete(formData)
     } catch (err: any) {
