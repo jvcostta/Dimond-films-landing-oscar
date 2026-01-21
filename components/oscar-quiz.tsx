@@ -38,7 +38,6 @@ export function OscarQuiz({ bolaoId, onComplete, onBack }: OscarQuizProps) {
   const [categories, setCategories] = useState<Category[]>([])
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0)
   const [selections, setSelections] = useState<Record<string, string>>({})
-  const [tiebreakerAnswer, setTiebreakerAnswer] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState("")
@@ -126,26 +125,6 @@ export function OscarQuiz({ bolaoId, onComplete, onBack }: OscarQuizProps) {
       )
 
       await Promise.all(promises)
-
-      // Salvar resposta do tiebreaker se foi preenchida
-      if (tiebreakerAnswer.trim()) {
-        const tiebreakerResponse = await fetch('/api/tiebreaker', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            user_id: user.id,
-            bolao_id: bolaoId,
-            answer: tiebreakerAnswer.trim(),
-          }),
-        })
-
-        if (!tiebreakerResponse.ok) {
-          const errorData = await tiebreakerResponse.json()
-          // Não interrompe o fluxo se falhar o tiebreaker
-        }
-      }
 
       // Chama onComplete para mostrar a tela de confirmação
       onComplete()
@@ -317,53 +296,6 @@ export function OscarQuiz({ bolaoId, onComplete, onBack }: OscarQuizProps) {
             )}
           </div>
 
-          {/* Tiebreaker question - only shown on last category */}
-          {isLastCategory && (
-            <div className="space-y-4 pt-6 border-t border-white/10">
-              <div className="space-y-2">
-                <Label htmlFor="tiebreaker" className="text-white text-base font-light tracking-wide">
-                  Se você pudesse entregar um Oscar para alguém da história do cinema, quem seria e por quê?
-                  <span className="text-amber-400 ml-1">*</span>
-                </Label>
-                <p className="text-xs text-white/50 italic">
-                  * essa pergunta é <strong className="text-amber-400">obrigatória</strong> e pode ser usada como critério de desempate
-                </p>
-                <Textarea
-                  id="tiebreaker"
-                  value={tiebreakerAnswer}
-                  onChange={(e) => setTiebreakerAnswer(e.target.value)}
-                  placeholder="Digite sua resposta aqui..."
-                  className="bg-white/5 border-white/20 text-white placeholder:text-white/30 min-h-[100px] focus:border-amber-400/50 focus:ring-amber-400/20"
-                />
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <button className="text-xs text-amber-400/ hover:text-amber-400 underline underline-offset-4">
-                      Em caso de empate consulte aqui as regras
-                    </button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-zinc-900 border-white/20">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="text-white text-xl">Regras de Desempate</AlertDialogTitle>
-                      <div className="text-white/80 space-y-3 text-sm pt-2">
-                        <p>Em caso de empate entre participantes com o mesmo número de acertos:</p>
-                        <ol className="list-decimal list-inside space-y-2 pl-2">
-                          <li>Quem acertar <strong className="text-amber-400">Melhor Filme</strong> tem prioridade.</li>
-                          <li>Se persistir o empate, vale a <strong className="text-amber-400">data/hora de envio</strong> (quem enviou primeiro vence).</li>
-                          <li>Se ainda houver empate, entra a <strong className="text-amber-400">pergunta criativa de desempate</strong>: "Se você pudesse entregar um Oscar para alguém da história do cinema, quem seria e por quê?"</li>
-                        </ol>
-                      </div>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogAction className="bg-amber-400 text-black hover:bg-amber-500">
-                        Entendi
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </div>
-          )}
-
           <div className="flex gap-4 pt-4">
             <Button
               onClick={handlePrevious}
@@ -377,7 +309,7 @@ export function OscarQuiz({ bolaoId, onComplete, onBack }: OscarQuizProps) {
 
             <Button
               onClick={isLastCategory ? handleSubmit : handleNext}
-              disabled={!selections[currentCategory.id] || isSaving || (isLastCategory && !tiebreakerAnswer.trim())}
+              disabled={!selections[currentCategory.id] || isSaving}
               className="flex-1 bg-white text-black hover:bg-white/90 font-semibold py-6 text-lg rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? 'Salvando...' : isLastCategory ? "Finalizar" : "Próxima Categoria"}

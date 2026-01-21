@@ -58,7 +58,13 @@ function HomeContent() {
           {!user ? (
             <div className="bg-black/60 border border-white/10 rounded-xl p-8">
               <h2 className="text-2xl font-semibold mb-2">Entre para participar do bolão</h2>
-              <p className="text-white/70 mb-6">Faça login ou crie sua conta para liberar seus palpites e participar dos rankings.</p>
+              <p className="text-white/70 mb-6">Faça login ou crie sua conta para enviar sua aposta no bolão principal e também criar/participar de rankings não oficiais com a sua galera.</p>
+              <button
+                className="text-sm text-[#ffcc33] hover:text-[#ffcc33]/80"
+                onClick={() => window.open('https://diamondfilms.com.br/static/regulamento-bolao-oscar', '_blank')}
+              >
+                Confira aqui o regulamento
+              </button>
 
               {/* Email/Password */}
               {mode === 'login' ? (

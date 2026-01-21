@@ -67,7 +67,7 @@ async function submitToRDStation(data: {
     city: data.city,
     cf_genero_favorito: data.favoriteGenre,
     cf_rede_de_cinema_favorita: data.cinemaNetwork,
-    tags: ['diamond_oscar_2025', 'bolao_oscar'],
+    tags: ['diamond_oscar_2026'],
   }
 
   try {

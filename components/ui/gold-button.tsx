@@ -24,6 +24,7 @@ export function GoldButton({ children, onClick, className = "", size = "default"
         text-white
         border-2 border-[#ffcc33]
         shadow-[0_0_6px_rgba(255,204,51,0.6),0_0_12px_rgba(255,204,51,0.4)]
+        cursor-pointer
         ${className}
       `}
     >

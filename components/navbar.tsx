@@ -37,7 +37,15 @@ export function Navbar() {
       }`}
     >
       <div className="w-full max-w-screen-2xl mx-auto px-3 sm:px-4 md:px-6">
-        <div className="flex items-center justify-end h-16">
+        <div className="flex items-center justify-between h-12">
+          {/* Logo à esquerda */}
+          <div className="flex items-center">
+            <img
+              src="/martySupreme.png"
+              alt="Marty Supreme"
+              className="h-10 w-auto object-contain"
+            />
+          </div>
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
             <button

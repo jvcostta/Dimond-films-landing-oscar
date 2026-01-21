@@ -8,7 +8,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ onStart }: HeroSectionProps) {
   return (
-    <section className="relative">
+    <section className="relative min-h-[120vh] md:min-h-[110vh]">
       <div className="slideshow">
         <div
           className="slide active"
@@ -32,16 +32,16 @@ export function HeroSection({ onStart }: HeroSectionProps) {
         </div>
 
         {/* Diamond Logo - Top Position */}
-        <div className="absolute top-20 md:top-8 left-1/2 -translate-x-1/2 z-30">
+        <div className="absolute top-8 md:top-6 left-1/2 -translate-x-1/2 z-30">
           <img
             src="/DimondLogo.svg"
             alt="Diamond Films"
-            className="w-32 h-32 md:w-32 md:h-32 object-contain drop-shadow-2xl opacity-90"
+            className="w-28 h-28 md:w-32 md:h-32 object-contain drop-shadow-2xl opacity-90"
           />
         </div>
 
         {/* Content Overlay - Centered */}
-        <div className="absolute inset-0 z-20 flex items-center justify-center pt-32 md:pt-40">
+        <div className="absolute inset-0 z-20 flex items-center justify-center pt-64 md:pt-72 pb-32 md:pb-40">
           <div className="max-w-5xl mx-auto px-6 text-center">
             <div className="flex flex-col items-center space-y-8 md:space-y-10">
               {/* Elegant Title */}
@@ -50,7 +50,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
                 <div className="w-16 h-[1px] bg-linear-to-r from-transparent via-amber-400/60 to-transparent mx-auto" />
                 
                 <div className="space-y-3">
-                  <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-[4.5rem] font-bold tracking-[0.08em] text-white drop-shadow-2xl leading-[1.15] uppercase">
+                  <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-[3.5rem] font-bold tracking-[0.05em] text-white drop-shadow-2xl leading-[1.15] uppercase">
                     <span className="block font-bold tracking-[0.12em]">Bolão do Oscar<sup className="text-[0.4em] align-super">®</sup></span>
                     <span className="block text-xl md:text-2xl lg:text-3xl xl:text-4xl font-thin tracking-[0.2em] text-amber-400/95 mt-3 md:mt-4">
                       2026
@@ -63,24 +63,23 @@ export function HeroSection({ onStart }: HeroSectionProps) {
               </div>
 
               {/* Tagline */}
-              <div className="max-w-2xl mx-auto space-y-5">
-                <p className="text-lg md:text-xl lg:text-2xl font-light text-white/95 drop-shadow-lg leading-relaxed tracking-wide">
-                  Adivinhe os vencedores.<br className="hidden md:block" /> Viva o cinema.
+              <div className="max-w-3xl mx-auto">
+                <p className="text-lg md:text-xl lg:text-1.5xl font-light text-white/95 drop-shadow-lg leading-relaxed tracking-wide">
+                  Mostre que você manda no mundo do cinema. Dispute o bolão principal com pessoas de todo o Brasil e concorra a 1 ano de cinema grátis* <br className="hidden md:block" /> + um Apple Watch SE.
                 </p>
               </div>
 
               {/* Description */}
-              <div className="max-w-2xl mx-auto pt-2">
+              <div className="max-w-3xl mx-auto -mt-2">
                 <p className="text-sm md:text-base lg:text-lg text-white/70 leading-relaxed text-pretty drop-shadow-md tracking-normal font-light">
-                  Mostre que você entende de cinema, dispute rankings, crie seu próprio bolão com amigos e concorra a um
-                  ano inteiro de experiências Diamond.
+                  Curte competir? Crie bolões privados com seus amigos na sua área exclusiva. Os prêmios oficiais são válidos apenas para o bolão principal.
                 </p>
               </div>
 
               {/* CTA Button */}
               <div className="flex justify-center pt-4">
                 <GoldButton onClick={onStart} size="lg">
-                  Participar do Bolão
+                  PARTICIPAR DO BOLÃO OFICIAL
                 </GoldButton>
               </div>
             </div>

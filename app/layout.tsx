@@ -11,7 +11,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Bolão do Oscar 2026 - Diamond Films",
   description:
-    "Adivinhe os vencedores. Viva o cinema. Participe do bolão, dispute rankings e concorra a prêmios incríveis.",
+    "Mostre que você domina o mundo do cinema, dispute o bolão principal com pessoas de todo o Brasil e tente ficar em primeiro lugar para ganhar",
   icons: {
     icon: [
       {

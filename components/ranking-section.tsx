@@ -98,7 +98,7 @@ export function RankingSection({ onStart }: RankingSectionProps) {
             onClick={onStart}
             size="lg"
           >
-            Participar do Bolão
+            PARTICIPAR DO BOLÃO OFICIAL
           </GoldButton>
         </div>
 

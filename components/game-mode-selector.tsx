@@ -170,7 +170,7 @@ export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
             <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent mx-auto" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
             {/* Individual Mode */}
             <button
               onClick={() => setSelectedMode("individual")}
@@ -190,9 +190,9 @@ export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-light tracking-wide">Jogar Individualmente</h3>
+                  <h3 className="text-2xl font-light tracking-wide">Jogar no bolão principal</h3>
                   <p className="text-white/70 leading-relaxed font-light">
-                    Participa automaticamente do ranking geral e disputa contra todos os participantes.
+                    Participe da disputa oficial da Diamond Films pelo grande prêmio. Um ranking único, com apenas um vencedor.
                   </p>
                 </div>
               </div>
@@ -225,9 +225,9 @@ export function GameModeSelector({ onSelect, onBack }: GameModeSelectorProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-light tracking-wide">Bolão em Grupo</h3>
+                  <h3 className="text-2xl font-light tracking-wide">Bolões com a sua galera</h3>
                   <p className="text-white/70 leading-relaxed font-light">
-                    Cria um bolão personalizado com ranking interno do grupo + ranking geral.
+                    Crie bolões privados com amigos e descubra quem entende mais de Oscar®. Os prêmios oficiais valem apenas para o bolão principal.
                   </p>
                 </div>
               </div>
