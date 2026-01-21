@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState, useRef, Suspense } from "react"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { Navbar } from "@/components/navbar"
 import { HeroSection } from "@/components/hero-section"
@@ -14,6 +14,7 @@ import { ConfirmationScreen } from "@/components/confirmation-screen"
 import { RankingSection } from "@/components/ranking-section"
 import { PrizeSection } from "@/components/prize-section"
 import { OscarNominations } from "@/components/oscar-nominations"
+import { EmailConfirmationHandler } from "@/components/email-confirmation-handler"
 
 type Step = "registration" | "game-mode" | "quiz" | "confirmation"
 type GameMode = "individual" | "group"
@@ -21,7 +22,6 @@ type GameMode = "individual" | "group"
 export default function Home() {
   const { user } = useAuth()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [step, setStep] = useState<Step>("registration")
   const [gameMode, setGameMode] = useState<GameMode | null>(null)
   const [bolaoId, setBolaoId] = useState<string>("")
@@ -31,23 +31,20 @@ export default function Home() {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const formSectionRef = useRef<HTMLDivElement>(null)
 
-  // Detecta se veio do callback de confirmação de email
-  useEffect(() => {
-    if (searchParams.get('confirmed') === 'true') {
-      setShowConfirmation(true)
-      setShowLogin(true)
-      
-      // Scroll para o formulário após 100ms
-      setTimeout(() => {
-        scrollToForm()
-      }, 100)
-      
-      // Remove a mensagem após 5 segundos
-      setTimeout(() => {
-        setShowConfirmation(false)
-      }, 5000)
-    }
-  }, [searchParams])
+  const handleEmailConfirmed = () => {
+    setShowConfirmation(true)
+    setShowLogin(true)
+    
+    // Scroll para o formulário após 100ms
+    setTimeout(() => {
+      scrollToForm()
+    }, 100)
+    
+    // Remove a mensagem após 5 segundos
+    setTimeout(() => {
+      setShowConfirmation(false)
+    }, 5000)
+  }
 
   const scrollToForm = () => {
     // Sempre rola até o formulário
@@ -87,12 +84,16 @@ export default function Home() {
     setGameMode(null)
     setBolaoId("")
     setUserData(null)
-    setGroupLink("")
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   return (
     <main className="min-h-screen bg-black text-white overflow-x-hidden w-full">
+      {/* Handler de confirmação de email */}
+      <Suspense fallback={null}>
+        <EmailConfirmationHandler onConfirmed={handleEmailConfirmed} />
+      </Suspense>
+      
       <Navbar />
       
       <HeroSection onStart={scrollToForm} />
