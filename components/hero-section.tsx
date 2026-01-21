@@ -32,7 +32,7 @@ export function HeroSection({ onStart }: HeroSectionProps) {
         </div>
 
         {/* Diamond Logo - Top Position */}
-        <div className="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 z-30">
+        <div className="absolute top-20 md:top-8 left-1/2 -translate-x-1/2 z-30">
           <img
             src="/DimondLogo.svg"
             alt="Diamond Films"

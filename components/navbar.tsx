@@ -43,7 +43,7 @@ export function Navbar() {
           : 'bg-black/40 backdrop-blur-sm'
       }`}
     >
-      <div className="container mx-auto px-4">
+      <div className="w-full max-w-screen-2xl mx-auto px-3 sm:px-4 md:px-6">
         <div className="flex items-center justify-end h-16">
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
@@ -52,12 +52,6 @@ export function Navbar() {
               className="text-white/90 hover:text-[#ffcc33] transition-colors text-sm font-medium"
             >
               Como Funciona
-            </button>
-            <button
-              onClick={() => scrollToSection('ranking-geral')}
-              className="text-white/90 hover:text-[#ffcc33] transition-colors text-sm font-medium"
-            >
-              Ranking Geral
             </button>
             <button
               onClick={() => scrollToSection('premio-oficial')}

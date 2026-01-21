@@ -10,19 +10,12 @@ interface ConfirmationScreenProps {
 }
 
 export function ConfirmationScreen({ gameMode, inviteCode, onBack }: ConfirmationScreenProps) {
-  const shareText = "Acabei de participar do Bolão do Oscar® 2026 - Diamond Films! 🎬"
-
   const shareOnWhatsApp = () => {
-    const url = inviteCode ? `${shareText}\n\nCódigo do bolão: ${inviteCode}` : shareText
-    window.open(`https://wa.me/?text=${encodeURIComponent(url)}`, "_blank")
-  }
-
-  const shareOnTikTok = () => {
-    window.open(`https://www.tiktok.com/`, "_blank")
-  }
-
-  const shareOnInstagram = () => {
-    window.open(`https://www.instagram.com/`, "_blank")
+    const message = inviteCode 
+      ? `Acabei de participar do Bolão do Oscar® 2026 - Diamond Films! 🎬 Código do bolão: ${inviteCode}\nhttps://dimond-films-landing-oscar-3s2d.vercel.app/`
+      : `Acabei de participar do Bolão do Oscar® 2026 - Diamond Films! 🎬 Código do bolão: W62JYZO1\nhttps://dimond-films-landing-oscar-3s2d.vercel.app/`
+    
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank")
   }
 
   const copyCode = () => {
@@ -97,29 +90,13 @@ export function ConfirmationScreen({ gameMode, inviteCode, onBack }: Confirmatio
           {/* Share buttons */}
           <div className="space-y-4">
             <p className="text-white/70 font-light tracking-wide">Compartilhe sua participação</p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button
                 onClick={shareOnWhatsApp}
                 className="bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold py-6 px-8 text-lg rounded-sm"
               >
                 <Share2 className="w-5 h-5 mr-2" />
                 WhatsApp
-              </Button>
-
-              <Button
-                onClick={shareOnTikTok}
-                className="bg-black hover:bg-black/80 text-white font-semibold py-6 px-8 text-lg rounded-sm border border-white/20"
-              >
-                <Share2 className="w-5 h-5 mr-2" />
-                TikTok
-              </Button>
-
-              <Button
-                onClick={shareOnInstagram}
-                className="bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] hover:opacity-90 text-white font-semibold py-6 px-8 text-lg rounded-sm"
-              >
-                <Share2 className="w-5 h-5 mr-2" />
-                Instagram
               </Button>
             </div>
           </div>

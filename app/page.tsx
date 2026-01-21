@@ -72,7 +72,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-black text-white overflow-x-hidden w-full">
       <Navbar />
       
       <HeroSection onStart={scrollToForm} />
@@ -81,7 +81,8 @@ export default function Home() {
         <HowItWorks onStart={scrollToForm} />
       </div>
       
-      <div id="ranking-geral">
+      {/* Ranking Geral - Temporariamente oculto */}
+      <div id="ranking-geral" className="hidden">
         <RankingSection onStart={scrollToForm} />
       </div>
       
