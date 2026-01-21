@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 
 interface EmailConfirmationHandlerProps {
   onConfirmed: () => void
@@ -9,25 +9,25 @@ interface EmailConfirmationHandlerProps {
 
 export function EmailConfirmationHandler({ onConfirmed }: EmailConfirmationHandlerProps) {
   const searchParams = useSearchParams()
-  const router = useRouter()
-  const hasRefreshed = useRef(false)
 
   useEffect(() => {
-    if (searchParams.get('confirmed') === 'true') {
-      // Se ainda não refreshou, força o refresh
-      if (!hasRefreshed.current) {
-        hasRefreshed.current = true
-        // Remove o parâmetro da URL
-        router.replace('/')
-        // Força o refresh da página
-        router.refresh()
-        // Chama o callback após um pequeno delay
-        setTimeout(() => {
-          onConfirmed()
-        }, 100)
-      }
+    const confirmed = searchParams.get('confirmed')
+    const hasRefreshed = sessionStorage.getItem('email-confirmed-refreshed')
+    
+    if (confirmed === 'true' && !hasRefreshed) {
+      // Marca que vai fazer o refresh
+      sessionStorage.setItem('email-confirmed-refreshed', 'true')
+      // Remove o parâmetro e recarrega a página
+      window.location.href = '/'
+      return
     }
-  }, [searchParams, onConfirmed, router])
+    
+    // Se já refreshou, mostra a confirmação e limpa a flag
+    if (hasRefreshed === 'true') {
+      sessionStorage.removeItem('email-confirmed-refreshed')
+      onConfirmed()
+    }
+  }, [searchParams, onConfirmed])
 
   return null
 }
