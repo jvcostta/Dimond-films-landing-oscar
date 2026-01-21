@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase/client'
 
 type User = {
   id: string
@@ -32,7 +33,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (storedUser) {
       setUser(JSON.parse(storedUser))
     }
-    setIsLoading(false)
+
+    // Verifica se há sessão ativa no Supabase
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        // Se há sessão no Supabase mas não no localStorage, sincroniza
+        if (!storedUser) {
+          await refreshUser()
+        }
+      }
+      setIsLoading(false)
+    }
+
+    checkSession()
+
+    // Escuta mudanças na autenticação do Supabase
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        // Usuário fez login ou token foi renovado
+        await refreshUser()
+      } else if (event === 'SIGNED_OUT') {
+        // Usuário fez logout
+        setUser(null)
+        localStorage.removeItem('user')
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
   const login = async (email: string, password: string) => {
@@ -90,14 +120,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = async () => {
     try {
+      // Verifica se há sessão ativa no Supabase
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        setUser(null)
+        localStorage.removeItem('user')
+        return
+      }
+
       const response = await fetch('/api/auth/me')
       if (response.ok) {
         const data = await response.json()
         setUser(data.user)
         localStorage.setItem('user', JSON.stringify(data.user))
+      } else {
+        // Se a API falhou mas há sessão, limpa tudo
+        setUser(null)
+        localStorage.removeItem('user')
       }
     } catch (error) {
       console.error('Erro ao recarregar usuário:', error)
+      setUser(null)
+      localStorage.removeItem('user')
     }
   }
 

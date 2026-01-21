@@ -27,7 +27,18 @@ export default function RedefinirSenhaPage() {
       if (session) {
         setIsValidSession(true)
       } else {
-        setError('Link inválido ou expirado. Por favor, solicite um novo link de recuperação.')
+        // Tenta obter session do hash/query params
+        const hashParams = new URLSearchParams(window.location.hash.substring(1))
+        const queryParams = new URLSearchParams(window.location.search)
+        
+        const accessToken = hashParams.get('access_token') || queryParams.get('access_token')
+        const type = hashParams.get('type') || queryParams.get('type')
+        
+        if (accessToken && type === 'recovery') {
+          setIsValidSession(true)
+        } else {
+          setError('Link inválido ou expirado. Por favor, solicite um novo link de recuperação.')
+        }
       }
     }
 
